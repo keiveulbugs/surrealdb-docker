@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    container_name: surrealdb
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./surrealdb_data:/data
+    command: 
+      - start
+      - --log=info
+      - --user=root
+      - --pass=root
+      - file:/data/database.db
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  rust-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rust-app
+    depends_on:
+      - surrealdb        
+    environment:
+      - DATABASE_URL=ws://127.0.0.1:8000/
+      - DATABASE_USER=root
+      - DATABASE_PASS=root
+      - DATABASE_NS=nft
+      - DATABASE_DB=nftdb
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  surrealdb_data:

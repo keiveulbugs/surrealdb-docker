@@ -1,0 +1,11 @@
+[package]
+name = "surrealdb-docker"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+surrealdb = { version = "2.1.2", default-features = false, features = [
+    "protocol-ws",
+] }
+once_cell = "1.19.0"

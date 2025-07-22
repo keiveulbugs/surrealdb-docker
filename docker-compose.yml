@@ -25,7 +25,7 @@ services:
     container_name: rust-app
     depends_on:
       - surrealdb    
-    # At the moment these don't do anything    
+    # At the moment these don't do anything, can be used tho if wished   
     environment:
       - DATABASE_URL=ws://127.0.0.1:8000/
       - DATABASE_USER=root

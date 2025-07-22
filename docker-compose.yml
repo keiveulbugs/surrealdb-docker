@@ -24,13 +24,14 @@ services:
       dockerfile: Dockerfile
     container_name: rust-app
     depends_on:
-      - surrealdb        
+      - surrealdb    
+    # At the moment these don't do anything    
     environment:
       - DATABASE_URL=ws://127.0.0.1:8000/
       - DATABASE_USER=root
       - DATABASE_PASS=root
-      - DATABASE_NS=nft
-      - DATABASE_DB=nftdb
+      - DATABASE_NS=testns
+      - DATABASE_DB=testdb
     networks:
       - app-network
     restart: unless-stopped

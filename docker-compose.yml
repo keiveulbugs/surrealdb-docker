@@ -12,6 +12,13 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    healthcheck:
+      test: CMD curl -I http://localhost:8000/health
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+      start_interval: 5s
 
   rust-app:
     build:
@@ -29,7 +36,7 @@ services:
       - DATABASE_DB=testdb
     networks:
       - app-network
-    restart: unless-stopped
+    restart: on-failure:1
 
 networks:
   app-network:

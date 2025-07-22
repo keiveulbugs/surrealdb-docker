@@ -8,17 +8,10 @@ services:
       - "8000:8000"
     volumes:
       - ./surrealdb_data:/data
-    command: start --log=info --user=root --pass=root -b 127.0.0.1:8000 file:/data/database.db
+    command: start --log=info --user=root --pass=root -b 127.0.0.1:8000 surrealkv:/data/database.db
     networks:
       - app-network
     restart: unless-stopped
-    healthcheck:
-      test: CMD curl -I http://localhost:8000/health
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-      start_interval: 5s
 
   rust-app:
     build:
@@ -27,6 +20,13 @@ services:
     container_name: rust-app
     depends_on:
       - surrealdb    
+    healthcheck:
+      test: CMD curl -I http://surrealdb:8000/health
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+      start_interval: 5s
     environment:
       - SURREAL_BIND=ws://surrealdb:8000/
 # these are currently not used

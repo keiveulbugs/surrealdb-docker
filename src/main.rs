@@ -4,7 +4,22 @@ static DB: Lazy<Surreal<any::Any>> = Lazy::new(Surreal::init);
 #[tokio::main]
 async fn main() {
     dbg!("Starting program to test SurrealDB connection");
-    match DB.connect("ws://127.0.0.1:8000/").await {
+    let remoteaddress = match std::env::var("SURREAL_BIND") {
+        Ok(val) => {
+            if !val.starts_with(|x: char| x.is_ascii_digit()) {
+                val
+            } else {
+                format!("ws://{val}")
+            }
+        }
+        Err(_) => "ws://127.0.0.1:8000".to_string(),
+    };
+
+    dbg!(
+        "Using the following address to connect to database:",
+        &remoteaddress
+    );
+    match DB.connect(remoteaddress).await {
         Ok(val) => {
             dbg!("Succesfully started a connection with SurrealDB");
             val

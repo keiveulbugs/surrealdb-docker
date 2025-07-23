@@ -1,6 +1,11 @@
 use ::{once_cell::sync::Lazy, surrealdb::Surreal, surrealdb::engine::any};
 static DB: Lazy<Surreal<any::Any>> = Lazy::new(Surreal::init);
 
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+struct Time {
+    time: std::time::SystemTime,
+}
+
 #[tokio::main]
 async fn main() {
     dbg!("Starting program to test SurrealDB connection");
@@ -56,5 +61,27 @@ async fn main() {
         .version()
         .await
         .expect("Failed to get the database version");
-    dbg!("Version of database running:", result_of_query);
+    dbg!(format!(
+        "Version of database running: {}.{}.{}",
+        result_of_query.major, result_of_query.minor, result_of_query.patch
+    ));
+    persistency_test().await;
+}
+
+async fn persistency_test() {
+    let result_time_in_db: Vec<Time> = DB.select("time").await.unwrap();
+    dbg!(format!("Persisent data: {:?}", result_time_in_db));
+    // Create a query with the time to insert in the database, so that we can check if the data is persisent or not between compose sessions.
+    let _time_in_db: Option<Time> = DB
+        .create("time")
+        .content(Time {
+            time: std::time::SystemTime::now(),
+        })
+        .await
+        .unwrap();
+    let result_time_in_db_check: Vec<Time> = DB.select("time").await.unwrap();
+    dbg!(format!(
+        "Check new data inserted: {:?}",
+        result_time_in_db_check
+    ));
 }
